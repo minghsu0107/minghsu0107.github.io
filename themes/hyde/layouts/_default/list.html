@@ -1,0 +1,9 @@
+{{ define "main" -}}
+<ul class="posts">
+  {{ range .Data.Pages -}}
+  <div class="chip">
+    <a href="{{ .Permalink }}/">{{ .LinkTitle }}</a>
+  </div>
+  {{- end }}
+</ul>
+{{- end }}
