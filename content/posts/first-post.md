@@ -44,7 +44,7 @@ theme : 'hyde'
 ```
 新增新的 post:
 ```bash
-hugo new posts/first-post.md -f yaml
+hugo new posts/first-post.md
 ```
 修改 `/content/posts/first-post.md`:
 ```yaml
