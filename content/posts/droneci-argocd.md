@@ -17,6 +17,7 @@ tags:
 
 ![](https://i.imgur.com/FygPEyK.png)
 <!--more-->
+[Source code](https://github.com/minghsu0107/cicd-demo)
 ## DroneCI
 DroneCI 是一個 cloud-native 的 CI (Continuous Integration) 工具。它很好的整合了 Github、Gitlab 與 Bitbucket 等多種程式碼托管平台，讓我們可以直接同步 repository 到 Drone 上。如同 TravisCI 與其他的 CI 工具一樣，我們可以用一個 yaml 檔描述我們的 pipeline (比如 `.drone.yml`)，而 Drone 在偵測到程式碼異動後就會觸發 webhook 去執行它。
 
@@ -53,6 +54,8 @@ ArgoCD 幫助我們同步 Git 上的 manitests 與 K8s 叢集資源的狀態。�
 3. 若測試通過就發布新的 image 到 Dockerhub 上，並更新 manitests repository 上的 image 版本
 4. ArgoCD 偵測到 manifests 的變動，因此通知 K8s 更新 image 並同步部署狀態
 ## 事先準備
+Source code 可以看 [這裡](https://github.com/minghsu0107/cicd-demo)。
+
 1. 一個 Drone server
     - [Github installation](https://docs.drone.io/server/provider/github/)
 2. 一個測試用 K8s 叢集
