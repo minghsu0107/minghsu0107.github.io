@@ -84,7 +84,10 @@ Subscribe(ctx context.Context, topic string) (<-chan *Message, error)
 
 ![](https://i.imgur.com/Yt6MIsA.png)
 
-在這個 Demo 中，有一個 publisher 每三秒向 `incoming_topic` 發布一個新消息。同時， `helloHandler` 與 `incomingTopicHandler` 訂閱了 `incoming_topic` 這個主題，而 `outgoingTopicHandler` 則訂閱了 `outgoing_topic`。當 `helloHandler` 收到了一個新消息，它會再發布另一個 greeting message 到 `outgoing_topic`，因而讓訂閱了 `outgoing_topic` 的 outgoingTopicHandler 收到了這個 greeting message。
+1. 有一個 publisher 每三秒向 `incoming_topic` 發布一個新消息
+2.  `helloHandler` 與 `incomingTopicHandler` 訂閱了 `incoming_topic` 這個主題，而 `outgoingTopicHandler` 則訂閱了 `outgoing_topic`
+3.  當 `helloHandler` 收到了一個新消息，它會再發布另一個 greeting message 到 `outgoing_topic`
+4.  最後訂閱了 `outgoing_topic` 的 outgoingTopicHandler 收到了這個 greeting message。
 
 接著來看看程式碼實作。首先我們建立一個 router，router 負責管理所有的 pub/sub handler，並且可以在 router 上註冊 global 的 middleware：
 ```go

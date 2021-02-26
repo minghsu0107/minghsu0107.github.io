@@ -6,7 +6,11 @@ theme : 'hyde'
 
 Menus:
   main:
+    - Name: "About"
+      URL: "/about"
     - Name: "Tags"
       URL: "/tags"
     - Name: "Categories"
       URL: "/categories"
+
+disqusShortname : minghsu0107
