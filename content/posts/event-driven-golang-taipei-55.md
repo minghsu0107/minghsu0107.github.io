@@ -11,18 +11,18 @@ tags:
 - Golang
 - Watermill
 ---
-這篇文章統整了我在 Golang Taipei #55 Meet Up 分享的內容。
+這篇文章統整了我在 Golang Taipei #55 Meetup 分享的內容。
 
 Event-driven architecture 在近幾年越來越受關注，它不僅幫助我們解耦服務組件、反轉依賴，更可提高系統的 throughput，大幅提升了擴展性。
 
 這次主題會講解 Event-driven 的核心概念，簡介幾種常見的分佈式消息系統，並展示如何輕鬆用 Golang 實作 event-driven application，幫助大家能更快理解。
 
-![](https://i.imgur.com/RuF8Gbk.png)
+{{< embed slide_page="3" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 <!--more-->
 ## 什麼是 Event
 Event 可以是一個「改變系統狀態」的變化，也可以是陳述當前系統狀態的「事實」，如使用者的點擊、sensor 的資料流、一筆成立的訂單資訊等。而產生 event 的一方叫生產者 (producer)，接收 event 的一方叫消費者 (consumer)。
 
-![](https://i.imgur.com/dxLNqaD.png)
+{{< embed slide_page="5" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 
 如上圖，event publisher 產生了一個 event 後，數個對此事件有興趣的 consumer 都可以訂閱它。
 ## 事件驅動架構
@@ -37,7 +37,7 @@ Event 可以是一個「改變系統狀態」的變化，也可以是陳述當�
 事件被 append 進 log 並存在 event store。不同於 Pub/Sub 模型，Consumer 可以參與任一事件流並從任何一個時間點開始 "replay"，產生一個 view，這個過程叫做 view generation。相關的應用有 Event sourcing、CQRS (讀寫分離) 等。
 
 
-![](https://i.imgur.com/aPDXAsU.png)
+{{< embed slide_page="6" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 
 上圖簡單的描述了一個 event sourcing 的架構。由 end users 產生的各種 event 會被存在 event store，而每個 consumer 各對應到一個 view generation，並寫道 read storage，而外部所有的 query 只會訪問 read storage。這樣讀寫分離的架構讓我們能更有彈性的根據不同場景選擇適合的 DB，比如需要全文檢索的時候就可以考慮使用 ElasticSearch 作為 read storage 等。
 ## Why 事件驅動
@@ -47,11 +47,10 @@ Event 可以是一個「改變系統狀態」的變化，也可以是陳述當�
 - 反轉依賴，讓系統更貼近真實業務邏輯關係。
 - 幫助我們建構 [responsive system](https://www.reactivemanifesto.org)：
 
-![](https://i.imgur.com/5pPEZwZ.png)
+{{< embed slide_page="7" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 
 ## 事件驅動與微服務
-![](https://i.imgur.com/OiY3GoP.png)
-- 圖源：[Microsoft Docs](https://docs.microsoft.com/zh-tw/dotnet/architecture/microservices/multi-container-microservice-net-applications/integration-event-based-microservice-communications)
+{{< embed slide_page="8" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 
 從上圖可以看到，微服務之間藉由 event bus (message broker) 使用事件彼此溝通 (pub/sub)，而每個微服務都各自維護一個 database，並訂閱與自身服務相關的事件。由此可以發現，一個微服務可以是生產者、消費者、或是兩者都是。
 ## 注意事項
@@ -59,10 +58,15 @@ Event 可以是一個「改變系統狀態」的變化，也可以是陳述當�
 - 要小心分散式交易時的資料一致性問題：在分散式的架構下，我們不再能使用 單個  DB transaction 確保交易的原子性。當一筆交易分佈在多個服務時確保交易一致性的方法：多階段提交、saga pattern。
 - 額外的維運成本：相比單體架構，有更多的服務與外部系統要維護、監控
 
+{{< embed slide_page="9" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
+
+
 小結：**事件驅動並不是 silven bullet，還是要看應用場景選擇最適合的架構**。
 ## 用 Golang 實作事件驅動
 ### Watermill
 - https://github.com/ThreeDotsLabs/watermill
+
+{{< embed slide_page="16" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 
 Watermill 是一個幫助我們實作 message streaming 的 Golang library，它統一 publish/subscribe 介面，因此可以輕鬆換到不同底層 broker 而不需修改核心程式碼。
 
@@ -201,13 +205,13 @@ docker-compose up
 
 下圖來自我在簡報中做的 Message broker 比較與整理：
 
-![](https://i.imgur.com/XeU2Bjr.png)
+{{< embed slide_page="11" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 
 Kafka 是許多企業的 event streaming 平台首選，這是因爲他的高 throughput、擴展性與可靠性。而 RabbitMQ 實作了 AMQP 協定，它豐富的 routing 機制讓我們可以處理很複雜的資料流。而 NATS Streaming 是三者中最年輕的，它是以 Golang 實作的 CNCF 專案，十分輕快速，部署也相對容易，並且結合了前述兩者的優點。
 
 舉例來說，NATS Streaming 有以下特性：
 
-![](https://i.imgur.com/RdSrRl2.png)
+{{< embed slide_page="13" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 
 由上圖可以看到，NATS Streaming 結合了 Kafka 的 ConsumerGroup 特點與 RabbitMQ 的路由 matching 機制，讓我們在開發上有更多選擇的彈性。
 ## 總結
