@@ -6,7 +6,7 @@ categories:
 - Web
 - Golang
 tags:
-- Event-driven
+- Event Driven
 - Web
 - Golang
 - Watermill
