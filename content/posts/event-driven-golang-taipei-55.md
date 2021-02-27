@@ -11,7 +11,7 @@ tags:
 - Golang
 - Watermill
 ---
-這篇文章統整了我在 Golang Taipei #55 Meetup 分享的內容。
+這篇文章統整了我在 [Golang Taipei #55 Meetup](https://www.meetup.com/golang-taipei-meetup/events/276423744/) 分享的內容。
 
 Event-driven architecture 在近幾年越來越受關注，它不僅幫助我們解耦服務組件、反轉依賴，更可提高系統的 throughput，大幅提升了擴展性。
 
@@ -55,7 +55,7 @@ Event 可以是一個「改變系統狀態」的變化，也可以是陳述當�
 從上圖可以看到，微服務之間藉由 event bus (message broker) 使用事件彼此溝通 (pub/sub)，而每個微服務都各自維護一個 database，並訂閱與自身服務相關的事件。由此可以發現，一個微服務可以是生產者、消費者、或是兩者都是。
 ## 注意事項
 - 使用前需要評估系統對資料一致性的要求：當資料具最終一致性的場境較容易處理
-- 要小心分散式交易時的資料一致性問題：在分散式的架構下，我們不再能使用 單個  DB transaction 確保交易的原子性。當一筆交易分佈在多個服務時確保交易一致性的方法：多階段提交、saga pattern。
+- 要小心分散式交易時的資料一致性問題：在分散式的架構下，我們不再能使用單個 DB transaction 確保交易的原子性。當一筆交易分佈在多個服務時確保交易一致性的方法：多階段提交、saga pattern。
 - 額外的維運成本：相比單體架構，有更多的服務與外部系統要維護、監控
 
 {{< embed slide_page="9" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
