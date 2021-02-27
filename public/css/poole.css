@@ -161,6 +161,7 @@ pre {
   display: block;
   margin-top: 0;
   margin-bottom: 1rem;
+  padding: 1rem;
   font-size: .8rem;
   line-height: 1.4;
   white-space: pre;
@@ -168,13 +169,6 @@ pre {
   word-break: break-all;
   word-wrap: break-word;
   background-color: #f9f9f9;
-
-  overflow-x: auto;
-
-  tab-size: 4;
-  -moz-tab-size: 4;
-
-  padding: 0;
 }
 pre code {
   padding: 0;
@@ -186,6 +180,7 @@ pre code {
   margin-bottom: 1rem;
   border-radius: 2px;
 }
+
 .highlight pre {
   margin-bottom: 0;
 }

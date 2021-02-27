@@ -42,7 +42,7 @@
 
   {{ partial "hook_head_end.html" . }}
 </head>
-<style type='text/css'>
+<style>
   pre,
   code {
     white-space: pre;
@@ -50,8 +50,13 @@
   }
 
   .hljs {
+    display: inline-block;
     overflow-x: scroll;
+    padding-right: 100%;
+    background: transparent;
     color: white;
+    -webkit-text-size-adjust: none;
+    min-width: 2300px;
   }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js"></script>

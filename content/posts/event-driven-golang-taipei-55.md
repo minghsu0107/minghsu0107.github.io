@@ -79,7 +79,7 @@ type Publisher interface {
     Close() error
 }
 type Subscriber interface {
-Subscribe(ctx context.Context, topic string) (<-chan *Message, error)
+    Subscribe(ctx context.Context, topic string) (<-chan *Message, error)
     Close() error
 }
 ```
@@ -124,6 +124,8 @@ func NewNATSPublisher(logger watermill.LoggerAdapter, clusterID, natsURL string)
         logger,
     )
 }
+```
+```go
 func NewNATSSubscriber(logger watermill.LoggerAdapter, clusterID, clientID, natsURL string) (message.Subscriber, error) {
     return nats.NewStreamingSubscriber(
         nats.StreamingSubscriberConfig{
