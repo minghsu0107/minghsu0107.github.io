@@ -61,7 +61,7 @@ Event 可以是一個「改變系統狀態」的變化，也可以是陳述當�
 {{< embed slide_page="9" data_id="3579c24fdefe4d62bc1641ea52beacfb" >}}
 
 
-小結：**事件驅動並不是 silven bullet，還是要看應用場景選擇最適合的架構**。
+小結：**事件驅動並不是 silver bullet，還是要看應用場景選擇最適合的架構**。
 ## 用 Golang 實作事件驅動
 ### Watermill
 - https://github.com/ThreeDotsLabs/watermill
