@@ -4,11 +4,9 @@ date: 2021-02-25T10:57:02+08:00
 draft: false
 ---
 
-我是許浩鳴 (Hao-Ming Hsu)，現在就讀台大資工三年級。
+I am Hao-Ming Hsu, now studying Computer Science in the National Taiwan University. Site reliability engineering (SRE) and cloud-native application development are main subjects I'm focusing on.
 
-我是個熱忱的開發者，熱愛學習與挑戰新事物。在先前的實驗室專題與實習中，我接觸了前端框架、微服務的開發與維運，目前專注在 Golang、後端開發與雲原生技術。
-
-在這邊分享一些軟工學習的心得，希望大家讀完能有所收穫。看完文章有其他想法也非常歡迎與我討論！
-
+As a passionate developer, I enjoy learning new things and sharing them with developer communities. I gained experience in microservice, database and DevOps throughout my internships. Thus, I'd like to share my thoughts and some learning notes in this blog. Further dicussion is welcome under each post!
 ## Contact Me
-**minghsu0107@gmail.com**
+- **minghsu0107@gmail.com**
+- **https://linkedin.com/in/hao-ming-hsu-178176181**
