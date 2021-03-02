@@ -23,9 +23,17 @@ The main idea is to make use of `context.Context` in `http.Request`. The context
 
 The following code shows the implementation of `AddUserID()` middleware, which summarizes the above procedure:
 ```go
+func extractToken(r *http.Request) string {
+	bearToken := r.Header.Get(conf.JWTAuthHeader)
+	strArr := strings.Split(bearToken, " ")
+	if len(strArr) == 2 {
+		return strArr[1]
+	}
+	return ""
+}
 func AddUserID() gin.HandlerFunc {
 	return func(c *gin.Context) {
-        accessToken := c.Request.Header.Get("Authentication")
+        accessToken := extractToken(c.Request)
         if accessToken == "" {
 		    c.AbortWithStatus(http.StatusUnauthorized)
 			return
