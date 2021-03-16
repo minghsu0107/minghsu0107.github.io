@@ -70,7 +70,7 @@ Source code 可以看 [這裡](https://github.com/minghsu0107/cicd-demo)。
 ### Setup
 當你成功的在 Drone 上連動 Github 帳號後，你可以在 Drone 的 dashboard 上看到所有的 repo。接著複製這個 repo、activate 它並前往 `Repositories -> cicd-demo -> settings` 新增以下 secret：
 
-![](https://i.imgur.com/pkxf7xI.png)
+![](https://user-images.githubusercontent.com/50090692/111301242-f04c2e80-868c-11eb-9945-c2de30b0ee92.png)
 
 - `docker_username`: 你的 Dockerhub 帳號
 - `docker_password`: 你的 Dockerhub 密碼
