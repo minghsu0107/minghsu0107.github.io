@@ -74,9 +74,7 @@ Source code 可以看 [這裡](https://github.com/minghsu0107/cicd-demo)。
 
 - `docker_username`: 你的 Dockerhub 帳號
 - `docker_password`: 你的 Dockerhub 密碼
-- `git_email`: 你的 Email
-- `git_username`: 你的 Github 帳號
-- `git_password`: 你的 Github 密碼
+- `ssh_key`: Github 的 SSH private key
 
 
 最後修改 `.drone.yml`，把 `minghsu0107` 替換成你自己的 Github 與 Dockerhub 帳號。現在在 `main` branch 上的 push 或 pull request 都會觸發 Drone pipeline，有關 Drone 的 Github webhook 的設定可以前往  `your repo -> setting -> webhook` 查看。
