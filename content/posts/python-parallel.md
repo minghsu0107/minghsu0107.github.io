@@ -3,7 +3,6 @@ title: "平行化你的 Python 程式"
 date: 2021-04-14T15:27:23+08:00
 draft: false
 categories:
-- Web
 - Python
 tags:
 - Web
