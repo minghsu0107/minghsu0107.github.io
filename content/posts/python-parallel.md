@@ -99,7 +99,7 @@ if __name__ == '__main__':
     pool_async()
 ```
 可能的 output：
-```
+```bash
 0 + 0 = 0
 1 + 1 = 2
 2 + 2 = 4
