@@ -6,7 +6,7 @@ categories:
 - Blogging
 tags:
 - Hugo
-- Go
+- Golang
 ---
 
 用 Github Page + Hugo 快速架設部落格網站。

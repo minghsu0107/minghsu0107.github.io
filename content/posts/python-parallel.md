@@ -5,7 +5,6 @@ draft: false
 categories:
 - Python
 tags:
-- Web
 - Python
 - Parallel
 ---
