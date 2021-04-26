@@ -46,7 +46,7 @@ The following section is hands-on tutorial that implements the above architectur
 You can find full source code on [my Github](https://github.com/minghsu0107/k8s-ha).
 
 HAProxy configuration for load balancing on K8s API servers (`haproxy.cfg`):
-```
+```bash
 global
     log /dev/log  local0 warning
     maxconn     4000
@@ -78,7 +78,7 @@ backend kube-apiserver
 ```
 
 Keepalived configuration (`keepalived.conf`):
-```
+```bash
 global_defs {
   default_interface {{ KEEPALIVED_INTERFACE }}
 }
