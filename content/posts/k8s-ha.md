@@ -43,8 +43,95 @@ The following section is hands-on tutorial that implements the above architectur
 - Node private IPs: `172.16.217.171`, `172.16.217.172`, `172.16.217.173`
 - Virtual IP: `172.16.100.100`, `172.16.100.101`
 ## Usage
+You can find full source code on [my Github](https://github.com/minghsu0107/k8s-ha).
+
+HAProxy configuration for load balancing on K8s API servers (`haproxy.cfg`):
+```
+global
+    log /dev/log  local0 warning
+    maxconn     4000
+    daemon
+  
+defaults
+  log global
+  option  httplog
+  option  dontlognull
+  timeout connect 5000
+  timeout client 50000
+  timeout server 50000
+
+
+frontend kube-apiserver
+  bind *:"$HAPROXY_PORT"
+  mode tcp
+  option tcplog
+  default_backend kube-apiserver
+
+backend kube-apiserver
+  mode tcp
+  option tcp-check
+  balance roundrobin
+  default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
+  server kube-apiserver-1 172.16.217.171:6443 check # simple http health check
+  server kube-apiserver-1 172.16.217.172:6443 check
+  server kube-apiserver-1 172.16.217.173:6443 check
+```
+
+Keepalived configuration (`keepalived.conf`):
+```
+global_defs {
+  default_interface {{ KEEPALIVED_INTERFACE }}
+}
+
+vrrp_script chk_haproxy {
+    # check haproxy
+    script "/bin/bash -c 'if [[ $(netstat -nlp | grep 7443) ]]; then exit 0; else exit 1; fi'"
+    interval 2 # check every two seconds
+    weight 11
+}
+
+vrrp_instance VI_1 {
+  interface {{ KEEPALIVED_INTERFACE }}
+
+  state {{ KEEPALIVED_STATE }}
+  virtual_router_id {{ KEEPALIVED_ROUTER_ID }}
+  priority {{ KEEPALIVED_PRIORITY }}
+  advert_int 2
+
+  unicast_peer {
+    {{ KEEPALIVED_UNICAST_PEERS }}
+  }
+
+  virtual_ipaddress {
+    {{ KEEPALIVED_VIRTUAL_IPS }}
+  }
+
+  authentication {
+    auth_type PASS
+    auth_pass {{ KEEPALIVED_PASSWORD }}
+  }
+
+  track_script {
+    chk_haproxy
+  }
+
+  {{ KEEPALIVED_NOTIFY }}
+}
+```
+This configure keepalived server to check if HAProxy is healthy every 2 seconds. Some important environment variables:
+- `KEEPALIVED_INTERFACE`: Keepalived network interface. Defaults to eth0
+- `KEEPALIVED_PASSWORD`: Keepalived password. Defaults to d0cker
+- `KEEPALIVED_PRIORITY` Keepalived node priority. Defaults to 150
+- `KEEPALIVED_ROUTER_ID` Keepalived virtual router ID. Defaults to 51
+- `KEEPALIVED_UNICAST_PEERS` Keepalived unicast peers. Defaults to `192.168.1.10`, `192.168.1.11`
+- `KEEPALIVED_VIRTUAL_IPS`: Keepalived virtual IPs. Defaults to `192.168.1.231`, `192.168.1.232`
+- `KEEPALIVED_NOTIFY`: Script to execute when node state change. Defaults to `/container/service/keepalived/assets/notify.sh`
+- `KEEPALIVED_STATE`: The starting state of keepalived; it can either be `MASTER` or `BACKUP`.
+
+We will use docker to run HAProxy and on each K8s controller plane replicas.
+
+On first node:
 ```bash
-# on first node
 docker run -d --net=host --volume $(pwd)/config/haproxy:/usr/local/etc/haproxy \
     -e HAPROXY_PORT=7443 \
     haproxy:2.3-alpine
@@ -52,12 +139,13 @@ docker run -d --cap-add=NET_ADMIN --cap-add=NET_BROADCAST --cap-add=NET_RAW --ne
     --volume $(pwd)/config/keepalived/keepalived.conf:/container/service/keepalived/assets/keepalived.conf \
     -e KEEPALIVED_INTERFACE=eth0 \
     -e KEEPALIVED_PASSWORD=pass \
-    -e KEEPALIVED_STATE=master \
+    -e KEEPALIVED_STATE=MASTER \
     -e KEEPALIVED_VIRTUAL_IPS="#PYTHON2BASH:['172.16.100.100', '172.16.100.101']" \
     -e KEEPALIVED_UNICAST_PEERS="#PYTHON2BASH:['172.16.217.171', '172.16.217.172', '172.16.217.173']" \
     osixia/keepalived:2.0.20 --copy-service
-
-# on second node
+```
+On second node:
+```bash
 docker run -d --net=host --volume $(pwd)/config/haproxy:/usr/local/etc/haproxy \
     -e HAPROXY_PORT=7443 \
     haproxy:2.3-alpine
@@ -65,12 +153,13 @@ docker run -d --net=host --volume $(pwd)/config/haproxy:/usr/local/etc/haproxy \
 docker run -d --cap-add=NET_ADMIN --cap-add=NET_BROADCAST --cap-add=NET_RAW --net=host \
     -e KEEPALIVED_INTERFACE=eth0 \
     -e KEEPALIVED_PASSWORD=pass \
-    -e KEEPALIVED_STATE=backup \
+    -e KEEPALIVED_STATE=BACKUP \
     -e KEEPALIVED_VIRTUAL_IPS="#PYTHON2BASH:['172.16.100.100', '172.16.100.101']" \
     -e KEEPALIVED_UNICAST_PEERS="#PYTHON2BASH:['172.16.217.171', '172.16.217.172', '172.16.217.173']" \
     osixia/keepalived:2.0.20 --copy-service
-
-# on third node
+```
+On third node:
+```bash
 docker run -d --net=host --volume $(pwd)/config/haproxy:/usr/local/etc/haproxy \
     -e HAPROXY_PORT=7443 \
     haproxy:2.3-alpine
@@ -78,18 +167,12 @@ docker run -d --cap-add=NET_ADMIN --cap-add=NET_BROADCAST --cap-add=NET_RAW --ne
     --volume $(pwd)/config/keepalived/keepalived.conf:/container/service/keepalived/assets/keepalived.conf \
     -e KEEPALIVED_INTERFACE=eth0 \
     -e KEEPALIVED_PASSWORD=pass \
-    -e KEEPALIVED_STATE=backup \
+    -e KEEPALIVED_STATE=BACKUP \
     -e KEEPALIVED_VIRTUAL_IPS="#PYTHON2BASH:['172.16.100.100', '172.16.100.101']" \
     -e KEEPALIVED_UNICAST_PEERS="#PYTHON2BASH:['172.16.217.171', '172.16.217.172', '172.16.217.173']" \
     osixia/keepalived:2.0.20 --copy-service
 ```
 Finally, point your dns to either `172.16.100.100` or `172.16.100.101`. From now on, a request with url `<https://your.domain.com:7443>` will be resolved to `https://<172.16.100.100|172.16.100.101>:7443`, rounted to the current keepalived master, and eventually sent to one of the three K8s API servers by HAProxy.
-
-Clean up virtual ip:
-```bash
-ip addr del 172.16.100.100/32 dev eth0
-ip addr del 172.16.100.101/32 dev eth0
-```
 ## Reference
 - https://kubernetes.io/docs/tasks/administer-cluster/highly-available-master/
 - https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
