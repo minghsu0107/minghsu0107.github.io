@@ -1,5 +1,5 @@
 ---
-title: "Learn Kubernetes HA architecture with Hands-On Example"
+title: "Learn Kubernetes HA Architecture with Hands-On Example"
 date: 2021-04-27T02:27:23+08:00
 draft: false
 categories:
