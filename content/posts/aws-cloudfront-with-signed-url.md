@@ -11,7 +11,9 @@ tags:
 - CloudFront
 - Golang
 ---
-## Why CloudFront
+
+Amazon CloudFront is a fast content delivery network (CDN) service managed by AWS. It serves your contents across edge locations around the globe with high transfer speeds and low latency under secured connections.
+
 ![](https://i.imgur.com/VVroqoy.png)
 <!--more-->
 ## Setting up CloudFront
@@ -19,6 +21,8 @@ Create a CloudFront distribution with orgin being your S3 bucket `mybucket`:
 
 ![](https://i.imgur.com/e6TDyeC.png)
 ![](https://i.imgur.com/LyXoeo0.png)
+
+Check your CloudFront distribution status [here](https://console.aws.amazon.com/cloudfront/home#distributions:). Wait until its status becomes `Deployed`. Then you will see the domain name of your CloudFront distribution. 
 
 We enabled the CloudFront bucket access restriction so that clients cannot access your object using S3 URL but only CloudFront URLs. This restriction mechanism works by creating a CloudFront origin access identity and adding it to your S3 permission policy.
 
