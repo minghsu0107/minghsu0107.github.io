@@ -34,7 +34,7 @@ Whenever your users access your Amazon S3 objects through CloudFront, the CloudF
 ## Signed URL Creation Example
 You can see the complete source code example on [my Github](https://github.com/minghsu0107/cloudFront-signed-url).
 
-In this example, we will use [Golang AWS SDK](https://github.com/aws/aws-sdk-go) to upload `hello.txt` to S3 bucket `mybucket` with key `mysubpath/hello.txt`. Then, we will create its signed URL, which has a 3 hour expiration.
+In this example, we will use [Golang AWS SDK](https://github.com/aws/aws-sdk-go) to upload `hello.txt` to S3 bucket `mybucket` with key `mysubpath/hello.txt`. Then, we will create its signed URL, which has a 1 hour expiration.
 ### Steps
 Create a new client session:
 ```go
@@ -61,7 +61,6 @@ output, err = uploader.UploadWithContext(context.Background(), &s3manager.Upload
     Bucket:  aws.String(s3Bucket),
     Key:     aws.String(objKey),
     Body:    fromFile,
-    Expires: aws.Time(time.Now().Local().Add(3 * time.Hour)),
 })
 ```
 Sign the object URL of `hello.txt` with your CloudFront key ID and private key:
@@ -95,6 +94,6 @@ u.Host = cfDomain
 signedURL = u.String()
 fmt.Printf("Get signed URL %q\n", signedURL)
 ```
-The object URL `https://my-s3-bucket.s3.us-east-2.amazonaws.com/mysubpath/hello.txt` will be signed, and the result will be printed in the standard output. Users can now access the object via this signed URL until it expires 3 hours later.
+The object URL `https://my-s3-bucket.s3.us-east-2.amazonaws.com/mysubpath/hello.txt` will be signed, and the result will be printed in the standard output. Users can now access the object via this signed URL until it expires 1 hour later.
 ## Reference
 - https://medium.com/@ratulbasak93/serving-private-content-of-s3-through-cloudfront-signed-url-593ede788d0d
