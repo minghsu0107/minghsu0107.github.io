@@ -28,19 +28,15 @@ Create CloudFront public key using the public key you just created:
 
 ![](https://i.imgur.com/RT65lEP.png)
 
-After the public key is created, it will have a public key ID. You will need it later when signing CloudFront URLs.
+After the public key is created, it will be given a public key ID. You will need it when signing CloudFront URLs.
 
 Create a key group that is associated with the CloutFront public key `mypublickey`:
 
 ![](https://i.imgur.com/rbPdxwV.png)
 
-Create a CloudFront distribution with orgin being your S3 bucket `mybucket`:
+Then create a CloudFront distribution. Connect its orgin to your S3 bucket `mybucket`. Also, enable the CloudFront bucket access restriction and add a new CloudFront origin access identity to your S3 permission policy:
 
 ![](https://i.imgur.com/e6TDyeC.png)
-
-Enable the CloudFront bucket access restriction and add a new CloudFront origin access identity to your S3 permission policy:
-
-![](https://i.imgur.com/d5TqGOK.png)
 
 Enable the CloudFront viewer access restriction and connect it to your key group:
 
