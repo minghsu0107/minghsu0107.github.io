@@ -20,7 +20,7 @@ In this post, we will set up an Amazon CloudFront distribution that serves priva
 <!--more-->
 ## Setting up CloudFront
 First, create a key pair for later use:
-```bash=
+```bash
 openssl genrsa -out cfprikey.pem 2048
 openssl rsa -in cfprikey.pem -outform PEM -pubout -out cfpublic.pem
 ```
