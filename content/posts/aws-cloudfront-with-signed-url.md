@@ -37,24 +37,30 @@ Create a key group that is associated with the CloutFront public key `mypublicke
 Create a CloudFront distribution with orgin being your S3 bucket `mybucket`:
 
 ![](https://i.imgur.com/e6TDyeC.png)
+
+Enable the CloudFront bucket access restriction and add a new CloudFront origin access identity to your S3 permission policy:
+
 ![](https://i.imgur.com/d5TqGOK.png)
+
+Enable the CloudFront viewer access restriction and connect it to your key group:
+
 ![](https://i.imgur.com/cNelOe1.png)
 
 Check your CloudFront distribution status [here](https://console.aws.amazon.com/cloudfront/home#distributions:). Wait until its status becomes `Deployed`. Then you will see the domain name of your CloudFront distribution. 
 
-We enabled the CloudFront bucket access restriction so that clients cannot access your object using S3 URL but only CloudFront URLs. This restriction mechanism works by creating a CloudFront origin access identity and adding it to your S3 permission policy.
+We enabled the CloudFront bucket access restriction so that clients cannot access your object using S3 URL but only CloudFront URLs. 
 
 Whenever your users access your Amazon S3 objects through CloudFront, the CloudFront origin access identity retrieves the objects on behalf of your users. If your users request objects directly by using Amazon S3 URLs, he or she will be denied. The procedure can be summarized in the following figure:
 
 ![](https://i.imgur.com/uMDqXdz.png)
 
-In addition, we restrict viewer access so that only requests through signed URLs are allowed to access your content. Choose the key group you have created previously.
+In addition, we restrict viewer access so that only requests through signed URLs are allowed to access your content. The signing mechanism works by hashing and signing one part of the URL using the private key from your public–private key pair. When someone uses a signed URL to access a file, CloudFront compares the signed and unsigned portions of the URL. If they don't match, CloudFront doesn't serve the file.
 
 If you don't restrict viewer access, all requests through CloudFront URLs are allowed to access your backend S3 objects, ie. they are public to the entire world. So please be sure to enable the viewer access restriction if you want to protect your private contents.
 ## Signed URL Creation Example
 You can see the complete source code example on [my Github](https://github.com/minghsu0107/cloudFront-signed-url).
 
-In this example, we will use [Golang AWS SDK](https://github.com/aws/aws-sdk-go) to upload `hello.txt` to S3 bucket `mybucket` with key `mysubpath/hello.txt`. Then, we will create its signed URL, which has a 1 hour expiration. Users can only access your private content `hello.txt` through this signed URL.
+In this example, we will use [Golang AWS SDK](https://github.com/aws/aws-sdk-go) to upload `hello.txt` to S3 bucket `mybucket` with key `mysubpath/hello.txt`. Then we will create its signed URL, which has a 1 hour expiration. Users can only access your private content `hello.txt` through this signed URL.
 
 First, create a new client session:
 ```go
@@ -105,6 +111,6 @@ if err != nil {
 }
 fmt.Printf("Get signed URL %q\n", signedURL)
 ```
-The CloudFront object URL `https://mycfdomain.cloudfront.net/mysubpath/hello.txt` is now signed and printed in the standard output. Users can access the object via this signed URL until it expires 1 hour later.
+The CloudFront object URL `https://mycfdomain.cloudfront.net/mysubpath/hello.txt` is now signed, and th result is printed in the standard output. Users can access `hello.txt` through this signed URL until it expires.
 ## Reference
 - https://medium.com/@ratulbasak93/serving-private-content-of-s3-through-cloudfront-signed-url-593ede788d0d
