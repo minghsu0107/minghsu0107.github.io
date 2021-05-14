@@ -1,5 +1,5 @@
 ---
-title: "使用 DroneCI 與 ArgoCD 實現 K8s 自動整合部署"
+title: "[K8s] 使用 DroneCI 與 ArgoCD 實現 K8s 自動整合部署"
 date: 2021-02-25T10:57:02+08:00
 draft: false
 categories:
