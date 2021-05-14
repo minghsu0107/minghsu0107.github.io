@@ -1,5 +1,5 @@
 ---
-title: "AWS CloudFront with Signed URL"
+title: "[AWS] AWS CloudFront with Signed URL"
 date: 2021-05-08T15:27:23+08:00
 draft: false
 categories:
