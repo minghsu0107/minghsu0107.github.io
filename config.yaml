@@ -14,3 +14,9 @@ Menus:
       URL: "/categories"
 
 #disqusShortname : minghsu0107
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
