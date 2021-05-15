@@ -19,13 +19,11 @@
         {{- end }}
       </ul>
     </nav>
-    <section class="resume-section p-3 p-lg-5 d-flex flex-column" style="margin: 0 auto;">
-      <div>
-        <form action={{ "search" | absURL }}>
-          <input placeholder="search" class="searchTerm" id="search-query" name="s" />
-        </form>
-      </div>
-    </section>
+    <div style="margin: 0 auto;">
+      <form action={{ "search" | absURL }}>
+        <input placeholder="search" class="searchTerm" id="search-query" name="s" />
+      </form>
+    </div>
     <br>
     <p>{{ with .Site.Params.copyright }}{{.}}{{ else }}&copy; {{ now.Format "2006"}}. All rights reserved. {{end}}</p>
   </div>
