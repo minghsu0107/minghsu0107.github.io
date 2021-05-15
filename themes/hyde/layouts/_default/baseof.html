@@ -1,12 +1,17 @@
 {{ partial "head.html" . }}
-  <body class="{{ .Site.Params.themeColor }} {{if .Site.Params.layoutReverse}}layout-reverse{{end}}">
-  {{ partial "sidebar.html" . }}
-    <main class="content container">
-    {{ block "main" . -}}{{- end }}
-    </main>
 
-    {{ if not .Site.IsServer }}
-      {{ template "_internal/google_analytics_async.html" . }}
-    {{ end }}
-  </body>
+<body class="{{ .Site.Params.themeColor }} {{if .Site.Params.layoutReverse}}layout-reverse{{end}}">
+  {{ partial "sidebar.html" . }}
+  <main class="content container">
+    {{ block "main" . -}}{{- end }}
+    <script src="https://utteranc.es/client.js" repo="minghsu0107/blog" issue-term="pathname" theme="github-light"
+      crossorigin="anonymous" async>
+      </script>
+  </main>
+
+  {{ if not .Site.IsServer }}
+  {{ template "_internal/google_analytics_async.html" . }}
+  {{ end }}
+</body>
+
 </html>
