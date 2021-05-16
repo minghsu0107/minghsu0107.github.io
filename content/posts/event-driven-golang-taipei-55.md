@@ -10,6 +10,12 @@ tags:
 - Web
 - Golang
 - Watermill
+description: |-
+  這篇文章統整了我在 [Golang Taipei #55 Meetup](https://www.meetup.com/golang-taipei-meetup/events/276423744/) 分享的內容。
+
+  Event-driven architecture 在近幾年越來越受關注，它不僅幫助我們解耦服務組件、反轉依賴，更可提高系統的 throughput，大幅提升了擴展性。
+
+  這次主題會講解 Event-driven 的核心概念，簡介幾種常見的分佈式消息系統，並展示如何輕鬆用 Golang 實作 event-driven application，幫助大家能更快理解。
 ---
 這篇文章統整了我在 [Golang Taipei #55 Meetup](https://www.meetup.com/golang-taipei-meetup/events/276423744/) 分享的內容。
 

@@ -10,6 +10,10 @@ tags:
 - S3
 - CloudFront
 - Golang
+description: |-
+  Amazon CloudFront is a fast content delivery network (CDN) service managed by AWS. It serves your contents across edge locations around the globe with high transfer speeds and low latency under secured connections.
+
+  In this post, we will set up an Amazon CloudFront distribution that serves private contents on your S3 bucket in order to speed up your content retrival while fully controlling user access permissions.
 ---
 
 Amazon CloudFront is a fast content delivery network (CDN) service managed by AWS. It serves your contents across edge locations around the globe with high transfer speeds and low latency under secured connections.

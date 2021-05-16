@@ -8,6 +8,8 @@ tags:
 - AWS
 - Docker
 - ECS
+description: |-
+  We are going to deploy a sample app container on Amazon ECS using Fargate, a serverless compute engine for containers. Fargate removes the need to provision and manage servers, lets us specify and pay for resources per application, and improves security through application isolation by design.
 ---
 
 We are going to deploy a sample app container on Amazon ECS using Fargate, a serverless compute engine for containers. Fargate removes the need to provision and manage servers, lets us specify and pay for resources per application, and improves security through application isolation by design.

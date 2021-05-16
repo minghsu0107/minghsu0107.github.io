@@ -7,6 +7,10 @@ categories:
 tags:
 - JCConf
 - Java
+description: |-
+  以下與大家分享一些這次 JCConf 2020 中我認為值得討論的主題。
+
+  整體來說，滿多議程在推廣 Kotlin 、serverless 與微服務的使用，而大家滿心期待的 Java virtual thread 也已如火如荼的開發中！
 ---
 
 以下與大家分享一些這次 JCConf 2020 中我認為值得討論的主題。

@@ -10,6 +10,8 @@ tags:
 - Golang
 - Gin-Gonic
 - HTTP
+description: |-
+  When developing HTTP APIs, we may have to process the same request-specific data throughout middlewares. Since it's a quite common pattern, I decide to figure it out and share how I solve it.
 ---
 When developing HTTP APIs, we may have to process the same request-specific data throughout middlewares. Since it's a quite common pattern, I decide to figure it out and share how I solve it.
 

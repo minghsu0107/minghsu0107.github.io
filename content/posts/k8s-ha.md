@@ -9,6 +9,8 @@ tags:
 - K8s
 - HA
 - Keepalived
+description: |-
+  Learn Kubernetes HA Architecture with Hands-On Example.
 ---
 The following diagram shows a typical high-availibility Kubernetes cluster with embedded etcd: 
 

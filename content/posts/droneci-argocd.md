@@ -11,6 +11,8 @@ tags:
 - ArgoCD
 - CI/CD
 - GitOps
+description: |-
+  這個教學使用 DroneCI 與 ArgoCD 打造 cloud-native 的持續整合交付平台，讓我們在 push commit 或 merge PR 後即可自動跑完測試、打包 image 並部署到 K8s 叢集。必且藉由版控，我們也得以輕鬆 rollback 到之前的任一版本！
 ---
 
 這個教學使用 DroneCI 與 ArgoCD 打造 cloud-native 的持續整合交付平台，讓我們在 push commit 或 merge PR 後即可自動跑完測試、打包 image 並部署到 K8s 叢集。必且藉由版控，我們也得以輕鬆 rollback 到之前的任一版本！

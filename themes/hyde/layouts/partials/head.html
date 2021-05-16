@@ -21,7 +21,8 @@
   {{- else -}}
   <title>{{ .Title }} &middot; {{ .Site.Title }}</title>
   {{- end }}
-  <meta name="description" content="{{if .IsHome}}{{ $.Site.Params.description }}{{else}}{{.Description}}{{end}}" />
+  <meta name="description"
+    content="{{if .IsHome}}This is Ming's technical blog. Technical topics are discussed here, including cloud-native technologies, backend development, and site reliability engineering (SRE).{{else}}{{ .Description }}{{end}}" />
 
   <!-- CSS -->
   <link type="text/css" rel="stylesheet" href="{{ .Site.BaseURL }}css/print.css" media="print">
