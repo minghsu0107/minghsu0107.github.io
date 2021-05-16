@@ -1,19 +1,17 @@
 {{ define "main" -}}
-<ul class="posts">
-    {{ range .Data.Pages -}}
-    <a href="{{ .Permalink }}">
-        <div class="catcard">
-            <div class="catcontainer">
-                <i class="fab fa-{{lower .Title }} fa-3x"></i>
-                <p class="cat"></i>&nbsp;&nbsp;{{ .Title }}</p>
-            </div>
+{{ range .Data.Pages -}}
+<a href="{{ .Permalink }}">
+    <div class="catcard">
+        <div class="catcontainer">
+            <i class="fab fa-{{lower .Title }} fa-3x"></i>
+            <p class="cat"></i>&nbsp;&nbsp;{{ .Title }}</p>
         </div>
-    </a>
-    {{- end }}
-</ul>
+    </div>
+</a>
+{{- end }}
 <style>
     .cat {
-        font-size: 32px;
+        font-size: 28px;
         text-align: center;
         font-weight: bold;
     }
