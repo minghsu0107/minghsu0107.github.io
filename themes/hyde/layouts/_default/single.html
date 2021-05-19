@@ -18,6 +18,46 @@
 <h2>Comments</h2>
 {{ template "_internal/disqus.html" . }}
 {{- end }}
+
+{{ $currentArticle := . }}
+{{ $articles := where
+(where $.Site.Pages ".Kind" "eq" "page")
+".Title" "!=" $currentArticle.Title }}
+{{ $veryRelevantArticles := slice }}
+{{ $relevantArticles := slice }}
+{{ range $idx, $article := $articles }}
+{{ $numberOfIntersections := len (
+intersect $article.Params.tags $currentArticle.Params.Tags
+) }}
+{{ if (ge $numberOfIntersections 2) }}
+{{ $veryRelevantArticles =
+$veryRelevantArticles | append $article }}
+{{ else if (eq $numberOfIntersections 1) }}
+{{ $relevantArticles =
+$relevantArticles | append $article }}
+{{ end }}
+{{ end }}
+{{ $recommendedArticles := slice }}
+{{ range $veryRelevantArticles }}
+{{ $recommendedArticles = $recommendedArticles | append . }}
+{{ end }}
+{{ range $relevantArticles }}
+{{ $recommendedArticles = $recommendedArticles | append . }}
+{{ end }}
+
+{{ if $recommendedArticles }}
+<h2>Recommended Articles</h2>
+{{end}}
+<ul>
+  {{ range (shuffle (first 5 $recommendedArticles)) }}
+  <li>
+    <a href="{{ .Permalink }}">
+      {{ .Title }}
+    </a>
+  </li>
+  {{ end }}
+</ul>
+
 <h2>Comments</h2>
 {{ partial "footer.html" . }}
 {{- end }}
