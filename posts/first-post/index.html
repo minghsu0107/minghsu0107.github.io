@@ -15,17 +15,38 @@
 ---
 <span style=color:#ae81ff>My first post!!!</span>
 </code></pre></div><p>啟動 testing server:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>hugo server -w
-</code></pre></div><p>成功的話會看到你的第一篇 post：</p><p><img src=/static/images/first-post.png alt=first-post></p><h2 id=部署到-github-page>部署到 Github Page</h2><p>首先將你的部落格打包：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>hugo --minify
-</code></pre></div><p>接著在 Github 新增 repo <code>minghsu0107.github.io</code>。接著在本機新增 branch <code>main</code> 與 subtree branch <code>gh-pages</code>:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>git add .
-git commit -m <span style=color:#e6db74>&#34;first commit&#34;</span>
-git branch -M main
-git remote add origin https://github.com/minghsu0107/minghsu0107.github.io.git
-git push -u origin main
-git subtree push --prefix public origin gh-pages
-</code></pre></div><p>接著到 Github repo 上， 從 <code>minghsu0107.github.io -> settings</code> 設定 Github page branch 為 <code>gh-pages</code>。</p><p>現在打開瀏覽器瀏覽 <code>https://minghsu0107.github.io</code> 就會看到部署完成的部落格！</p><h2 id=一鍵部署>一鍵部署</h2><p>在你的 <code>.bashrc</code> 新增:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>alias pub<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;
-</span><span style=color:#e6db74>    cd /Users/xuhaoming/Desktop/blog \ 
-</span><span style=color:#e6db74>    git checkout main &amp;&amp; hugo --minify \
-</span><span style=color:#e6db74>    git add . &amp;&amp; git commit -m &#39;update&#39; \
-</span><span style=color:#e6db74>    git push origin main \
-</span><span style=color:#e6db74>    git subtree push --prefix public origin gh-pages&#34;</span>
-</code></pre></div><p>從今以後，只要執行 <code>pub</code> 即可發布最新的部落格變更！</p><h2 id=reference>Reference</h2><ul><li><a href=https://themes.gohugo.io/hyde/>https://themes.gohugo.io/hyde/</a></li><li><a href=https://gohugo.io/templates/lookup-order/>https://gohugo.io/templates/lookup-order/</a></li></ul></div><h2>Recommended Articles</h2><ul><li><a href=https://minghsu0107.github.io/posts/event-driven-golang-taipei-55/>輕鬆「Go」建事件驅動應用</a></li><li><a href=https://minghsu0107.github.io/posts/aws-cloudfront-with-signed-url/>[AWS] AWS CloudFront with Signed URL</a></li><li><a href=https://minghsu0107.github.io/posts/http-context/>Passing Parameters in Golang HTTP Context</a></li></ul><h2>Comments</h2><script src=https://utteranc.es/client.js repo=minghsu0107/blog issue-term=pathname theme=github-light crossorigin=anonymous async></script></main></body></html>
+</code></pre></div><p>成功的話會看到你的第一篇 post：</p><p><img src=/static/images/first-post.png alt=first-post></p><h2 id=部署到-github-page>部署到 Github Page</h2><p>在 <code>.github/workflows/gh-pages.yaml</code> 新增 hugo deployment 的 github action:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>name</span>: <span style=color:#ae81ff>github pages</span>
+
+<span style=color:#f92672>on</span>:
+  <span style=color:#f92672>push</span>:
+    <span style=color:#f92672>branches</span>:
+      - <span style=color:#ae81ff>main </span> <span style=color:#75715e># Set a branch name to trigger deployment</span>
+  <span style=color:#f92672>pull_request</span>:
+
+<span style=color:#f92672>jobs</span>:
+  <span style=color:#f92672>deploy</span>:
+    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>ubuntu-18.04</span>
+    <span style=color:#f92672>steps</span>:
+      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v2</span>
+        <span style=color:#f92672>with</span>:
+          <span style=color:#f92672>submodules</span>: <span style=color:#66d9ef>true</span>  <span style=color:#75715e># Fetch Hugo themes (true OR recursive)</span>
+          <span style=color:#f92672>fetch-depth</span>: <span style=color:#ae81ff>0</span>    <span style=color:#75715e># Fetch all history for .GitInfo and .Lastmod</span>
+
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup Hugo</span>
+        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>peaceiris/actions-hugo@v2</span>
+        <span style=color:#f92672>with</span>:
+          <span style=color:#f92672>hugo-version</span>: <span style=color:#e6db74>&#39;0.83.1&#39;</span>
+
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Build</span>
+        <span style=color:#f92672>run</span>: <span style=color:#ae81ff>hugo --minify</span>
+
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Deploy</span>
+        <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>peaceiris/actions-gh-pages@v3</span>
+        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.ref == &#39;refs/heads/main&#39;</span>
+        <span style=color:#f92672>with</span>:
+          <span style=color:#f92672>github_token</span>: <span style=color:#ae81ff>${{ secrets.GITHUB_TOKEN }}</span>
+          <span style=color:#f92672>publish_dir</span>: <span style=color:#ae81ff>./public</span>
+          <span style=color:#f92672>cname</span>: <span style=color:#ae81ff>minghsu.io</span>
+</code></pre></div><p>接著新增一個新的分支 <code>gh-pages</code>，Github Actions 之後會將 hugo 打包並部署這個分支：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>git checkout -b gh-pages
+git push origin gh-pages
+</code></pre></div><p>把 code 推到 Github 上之後，Github Actions 會嘗試部署 github pages。不過這次的部署會失敗，因為我們還沒設定 Github Page 的 branch。因此接著我們要到 repository 的 <code>settings</code> 將 Github page 的分支設定為 <code>gh-pages</code>。現在 Github Page 會重新開始部署，成功之後瀏覽 <code>https://minghsu.io</code> 就能看到部署完成的部落格！</p><h2 id=reference>Reference</h2><ul><li><a href=https://themes.gohugo.io/hyde/>https://themes.gohugo.io/hyde/</a></li><li><a href=https://gohugo.io/templates/lookup-order/>https://gohugo.io/templates/lookup-order/</a></li></ul></div><h2>Recommended Articles</h2><ul><li><a href=https://minghsu0107.github.io/posts/event-driven-golang-taipei-55/>輕鬆「Go」建事件驅動應用</a></li><li><a href=https://minghsu0107.github.io/posts/http-context/>Passing Parameters in Golang HTTP Context</a></li><li><a href=https://minghsu0107.github.io/posts/aws-cloudfront-with-signed-url/>[AWS] AWS CloudFront with Signed URL</a></li></ul><h2>Comments</h2><script src=https://utteranc.es/client.js repo=minghsu0107/blog issue-term=pathname theme=github-light crossorigin=anonymous async></script></main></body></html>
