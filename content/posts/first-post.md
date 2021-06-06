@@ -66,7 +66,7 @@ hugo server -w
 
 ![first-post](/static/images/first-post.png)
 
-## 部署到 Github Page
+## 部署到 Github Pages
 在 `.github/workflows/gh-pages.yaml` 新增打包與部署 hugo 的 Github Actions:
 ```yaml
 name: github pages
