@@ -67,7 +67,11 @@ hugo server -w
 ![first-post](/static/images/first-post.png)
 
 ## 部署到 Github Page
-在 Github 新增 repo `minghsu0107.github.io`。接著在本機新增 branch `main` 與 subtree branch `gh-pages`:
+首先將你的部落格打包：
+```bash
+hugo --minify
+```
+接著在 Github 新增 repo `minghsu0107.github.io`。接著在本機新增 branch `main` 與 subtree branch `gh-pages`:
 ```bash
 git add .
 git commit -m "first commit"
