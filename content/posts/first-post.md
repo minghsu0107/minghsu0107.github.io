@@ -1,5 +1,5 @@
 ---
-title: "我如何架設這部落格的？"
+title: "我如何架設這個部落格的？"
 date: 2021-02-24T16:27:23+08:00
 draft: false
 categories:
@@ -8,10 +8,10 @@ tags:
 - Hugo
 - Golang
 description: |-
-  用 Github Page + Hugo 快速架設部落格網站。
+  用 Hugo + Github Pages + Github Actions 快速架設部落格網站。
 ---
 
-用 Github Page + Hugo 快速架設部落格網站。
+用 Hugo + Github Pages + Github Actions 快速架設部落格網站。
 
 ![](https://i.imgur.com/vUVbWN9.png)
 <!--more-->
@@ -67,7 +67,7 @@ hugo server -w
 ![first-post](/static/images/first-post.png)
 
 ## 部署到 Github Page
-在 `.github/workflows/gh-pages.yaml` 新增 hugo deployment 的 github action:
+在 `.github/workflows/gh-pages.yaml` 新增打包與部署 hugo 的 Github Actions:
 ```yaml
 name: github pages
 
@@ -102,12 +102,12 @@ jobs:
           publish_dir: ./public
           cname: minghsu.io
 ```
-接著新增一個新的分支 `gh-pages`，Github Actions 之後會將 hugo 打包並部署這個分支：
+接著新增一個新的分支 `gh-pages`，Github Actions 之後會將部落格打包並部署這個分支：
 ```bash
 git checkout -b gh-pages
 git push origin gh-pages
 ```
-把 code 推到 Github 上之後，Github Actions 會嘗試部署 github pages。不過這次的部署會失敗，因為我們還沒設定 Github Page 的 branch。因此接著我們要到 repository 的 `settings` 將 Github page 的分支設定為 `gh-pages`。現在 Github Page 會重新開始部署，成功之後瀏覽 `https://minghsu.io` 就能看到部署完成的部落格！
+把 code 推到 Github 上之後，Github Actions 會開始部署部落格。不過這次的部署會失敗，因為我們還沒設定 Github Pages 的 branch。因此接著我們要到 `Settings -> Pages` 將 Github Pages 的分支設定為 `gh-pages`。現在 Github Pages 會重新開始部署，成功之後瀏覽 `https://minghsu.io` 就能看到部落格！
 ## Reference
 - https://themes.gohugo.io/hyde/
 - https://gohugo.io/templates/lookup-order/
