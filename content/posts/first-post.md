@@ -67,36 +67,47 @@ hugo server -w
 ![first-post](/static/images/first-post.png)
 
 ## 部署到 Github Page
-首先將你的部落格打包：
-```bash
-hugo --minify
+在 `.github/workflows/gh-pages.yaml` 新增 hugo deployment 的 github action:
+```yaml
+name: github pages
+
+on:
+  push:
+    branches:
+      - main  # Set a branch name to trigger deployment
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.83.1'
+
+      - name: Build
+        run: hugo --minify
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          cname: minghsu.io
 ```
-
-接著在 Github 新增 repo `minghsu0107.github.io`。接著在本機新增 branch `main` 與 subtree branch `gh-pages`:
+接著新增一個新的分支 `gh-pages`，Github Actions 之後會將 hugo 打包並部署這個分支：
 ```bash
-git add .
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/minghsu0107/minghsu0107.github.io.git
-git push -u origin main
-git subtree push --prefix public origin gh-pages
+git checkout -b gh-pages
+git push origin gh-pages
 ```
-
-接著到 Github repo 上， 從 `minghsu0107.github.io -> settings` 設定 Github page branch 為 `gh-pages`。
-
-現在打開瀏覽器瀏覽 `https://minghsu0107.github.io` 就會看到部署完成的部落格！
-
-## 一鍵部署
-在你的 `.bashrc` 新增:
-```bash
-alias pub="
-    cd /Users/xuhaoming/Desktop/blog \ 
-    git checkout main && hugo --minify \
-    git add . && git commit -m 'update' \
-    git push origin main \
-    git subtree push --prefix public origin gh-pages"
-```
-從今以後，只要執行 `pub` 即可發布最新的部落格變更！
+把 code 推到 Github 上之後，Github Actions 會嘗試部署 github pages。不過這次的部署會失敗，因為我們還沒設定 Github Page 的 branch。因此接著我們要到 repository 的 `settings` 將 Github page 的分支設定為 `gh-pages`。現在 Github Page 會重新開始部署，成功之後瀏覽 `https://minghsu.io` 就能看到部署完成的部落格！
 ## Reference
 - https://themes.gohugo.io/hyde/
 - https://gohugo.io/templates/lookup-order/
