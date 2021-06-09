@@ -20,7 +20,7 @@ Amazon CloudFront is a fast content delivery network (CDN) service managed by AW
 
 In this post, we will set up an Amazon CloudFront distribution that serves private contents on your S3 bucket in order to speed up your content retrival while fully controlling user access permissions.
 
-![](https://i.imgur.com/VVroqoy.png)
+![](/static/images/VVroqoy.png)
 <!--more-->
 ## Setting up CloudFront
 First, create a key pair for later use:
@@ -30,21 +30,21 @@ openssl rsa -in cfprikey.pem -outform PEM -pubout -out cfpublic.pem
 ```
 Create CloudFront public key using the public key you just created:
 
-![](https://i.imgur.com/RT65lEP.png)
+![](/static/images/RT65lEP.png)
 
 After the public key is created, it will be given a public key ID. You will need it when signing CloudFront URLs.
 
 Create a key group that is associated with the CloutFront public key `mypublickey`:
 
-![](https://i.imgur.com/rbPdxwV.png)
+![](/static/images/rbPdxwV.png)
 
 Then create a CloudFront distribution. Connect its orgin to your S3 bucket `mybucket`. Also, enable the CloudFront bucket access restriction and add a new CloudFront origin access identity to your S3 permission policy:
 
-![](https://i.imgur.com/e6TDyeC.png)
+![](/static/images/e6TDyeC.png)
 
 Enable the CloudFront viewer access restriction and connect it to your key group:
 
-![](https://i.imgur.com/cNelOe1.png)
+![](/static/images/cNelOe1.png)
 
 Check your CloudFront distribution status [here](https://console.aws.amazon.com/cloudfront/home#distributions:). Wait until its status becomes `Deployed`. Then you will see the domain name of your CloudFront distribution. 
 
@@ -52,7 +52,7 @@ We enabled the CloudFront bucket access restriction so that clients cannot acces
 
 Whenever your users access your Amazon S3 objects through CloudFront, the CloudFront origin access identity retrieves the objects on behalf of your users. If your users request objects directly by using Amazon S3 URLs, he or she will be denied. The procedure can be summarized in the following figure:
 
-![](https://i.imgur.com/uMDqXdz.png)
+![](/static/images/uMDqXdz.png)
 
 In addition, we restrict viewer access so that only requests through signed URLs are allowed to access your content. The signing mechanism works by hashing and signing one part of the URL using the private key from your public–private key pair. When someone uses a signed URL to access a file, CloudFront compares the signed and unsigned portions of the URL. If they don't match, CloudFront doesn't serve the file.
 

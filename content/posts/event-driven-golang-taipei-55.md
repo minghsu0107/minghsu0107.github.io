@@ -92,7 +92,7 @@ type Subscriber interface {
 ### Demo
 完整程式碼請看[這裡](https://github.com/minghsu0107/golang-taipei-watermill-example)。
 
-![](https://i.imgur.com/Yt6MIsA.png)
+![](/static/images/Yt6MIsA.png)
 
 1. 有一個 publisher 每三秒向 `incoming_topic` 發布一個新消息
 2.  `helloHandler` 與 `incomingTopicHandler` 訂閱了 `incoming_topic` 這個主題，而 `outgoingTopicHandler` 則訂閱了 `outgoing_topic`
