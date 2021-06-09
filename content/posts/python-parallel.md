@@ -13,7 +13,7 @@ description: |-
 
 在運行程式時，我們常希望善用系統的多核環境平行處理資料以提升計算的效率。然而 Python 的平行化似乎沒有那麼簡單。這篇文章會簡單介紹平行運算的概念、平行化 Python 時會遇到的問題、以及如何解決它們。
 
-![](https://i.imgur.com/3MDT9fN.png)
+![](/static/images/3MDT9fN.png)
 <!--more-->
 
 ## Multiprocessing vs. Multithreading

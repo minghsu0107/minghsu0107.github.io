@@ -17,7 +17,7 @@ description: |-
 
 這個教學使用 DroneCI 與 ArgoCD 打造 cloud-native 的持續整合交付平台，讓我們在 push commit 或 merge PR 後即可自動跑完測試、打包 image 並部署到 K8s 叢集。必且藉由版控，我們也得以輕鬆 rollback 到之前的任一版本！
 
-![](https://i.imgur.com/FygPEyK.png)
+![](/static/images/FygPEyK.png)
 <!--more-->
 [Source code](https://github.com/minghsu0107/cicd-demo)
 ## DroneCI 介紹
@@ -49,7 +49,7 @@ ArgoCD 幫助我們同步 Git 上的 manitests 與 K8s 叢集資源的狀態。�
 
 而這樣管理 K8s 叢集與應用程式交付的方式就叫做 **GitOps**。GitOps 讓我們可以維護服務部署狀態的 "source of truth"，進而提升團隊維護的效率與系統的可靠性。
 ## Overview
-![](https://i.imgur.com/FygPEyK.png)
+![](/static/images/FygPEyK.png)
 
 1. 使用者 push 程式碼或是 merge 新的 PR
 2. 觸發 webhook，Drone 開始執行定義在 `.drone.yml` 的 CI pipeline
@@ -105,29 +105,29 @@ argocd repo add <repo-url> --username=<username> --password=<password>
 ```
 也可以使用 GUI：前往 `Settings/Repositories`、點擊 `Connect Repo using HTTPS` 並輸入 credentials：
 
-![](https://i.imgur.com/UAyNkte.png)
+![](/static/images/UAyNkte.png)
 
 你會看到如以下的畫面：
 
-![](https://i.imgur.com/XaMezBA.png)
+![](/static/images/XaMezBA.png)
 
 新增一個 app：
 
-![](https://i.imgur.com/gOD9h1b.png)
+![](/static/images/gOD9h1b.png)
 
-![](https://i.imgur.com/8XlNtDL.png)
+![](/static/images/8XlNtDL.png)
 
-![](https://i.imgur.com/JK76lnT.png)
+![](/static/images/JK76lnT.png)
 
 記得把 repo 替換成你自己的。
 
 現在我們完成了所有的準備，前往 `/applications` 並點擊 `SYNC` 就可以看到 ArgoCD 自動同步了 cluster 的狀態！
 
-![](https://i.imgur.com/RVH5QtL.png)
+![](/static/images/RVH5QtL.png)
 
 也可以點進去 app 看看一些詳細資訊：
 
-![](https://i.imgur.com/pconXQR.png)
+![](/static/images/pconXQR.png)
 ## 總結
 DroneCI 與 ArgoCD 都是滿好上手的工具，而且功能也很強大。今後大家若要建置 CI/CD 平台，但又希望自己 host 伺服器而非使用第三方提供的服務 (可能有成本的考量等)，DroneCI 與 ArgoCD 的組合是一個值得考慮的選擇。
 ## Reference

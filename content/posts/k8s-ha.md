@@ -14,7 +14,7 @@ description: |-
 ---
 The following diagram shows a typical high-availibility Kubernetes cluster with embedded etcd: 
 
-![](https://i.imgur.com/FwEzzWV.png)
+![](/static/images/FwEzzWV.png)
 
 However, HA architecture also brings about another problem - which K8s API server should the client connect to? How to detect a node failure while fowarding traffic in order to achieve high availibility?
 <!--more-->
@@ -33,7 +33,7 @@ To achieve high availibility, we will use Keepalived, a LVS (Linux Virtual Serve
 
 To sum up, we have the following architecture:
 
-![](https://i.imgur.com/FrwyxCQ.png)
+![](/static/images/FrwyxCQ.png)
 
 1. A floating vip maps to three keepalived servers (one master and two backups). Each keepalived server runs on a K8s controller plane replica.
 2. When keepalived master server fails, vip floats to another backup server automatically.

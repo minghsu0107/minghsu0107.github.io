@@ -13,7 +13,7 @@ description: |-
 
 用 Hugo + Github Pages + Github Actions 快速架設部落格網站。
 
-![](https://i.imgur.com/vUVbWN9.png)
+![](/static/images/vUVbWN9.png)
 <!--more-->
 Hugo 是一個用 Go 撰寫的開源網站架設引擎。它幫助我們得以快速得架設一個靜態網站。
 ## 安裝 Hugo

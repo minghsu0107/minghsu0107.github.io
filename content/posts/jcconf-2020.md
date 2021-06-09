@@ -17,7 +17,7 @@ description: |-
 
 整體來說，滿多議程在推廣 Kotlin 、serverless 與微服務的使用，而大家滿心期待的 Java virtual thread 也已如火如荼的開發中！
 
-![](https://i.imgur.com/T6Ib4ws.png)
+![](/static/images/T6Ib4ws.png)
 <!--more-->
 
 ## 用開源的 MySQL 叢集解決大型網路應用的擴充性問題
@@ -29,7 +29,7 @@ description: |-
 
 為了解決上述的痛點，MySQL 提出了最新的高可用方案，包含了 MySQL Replication、MySQL Group Replication、Shared Disk Based Active/Passive 與 MySQL Cluster：
 
-![](https://i.imgur.com/djvJIV2.png)
+![](/static/images/djvJIV2.png)
 
 舉例來說，使用 MySQL Cluster 和 MySQL Group Replication多主模式的話，便可用 Connector/J 這個 Java SQL driver 達成負載平衡。而 MySQL Replicatino 與 MySQL Group Replication 的單主模式下則可用 Connector/J 的複製/讀寫分離模式 (只需將 connection object 設為 read-only)。另外，只需一行便可在 Connector/J 的 JDBC 上完成故障移轉。
 
@@ -40,7 +40,7 @@ description: |-
 - 高擴展
 - 使用簡單和具有彈性
 
-![](https://i.imgur.com/7m08DGY.png)
+![](/static/images/7m08DGY.png)
 ### MySQL & NoSQL
 Cluster/J 是個另一個 MySQL Cluster 的 driver。它不經 SQL 節點，在 Java程式中透過 JNI 直接呼叫以 C 所開發的NDB API，目的是將 MySQL 以表為主的資料對應到 Java 程式的物件。使用 Cluster/J 便可以 NoSQL 的方式直接取用 MySQL Cluster 上的資料。Cluster/J 以 ClusterJPA 抽象化，支援JPA 而增加可攜性並提供以下特性：
 - Persistent classes
@@ -49,7 +49,7 @@ Cluster/J 是個另一個 MySQL Cluster 的 driver。它不經 SQL 節點，在 
 - Lazy loading
 - Table and index creation from object model
 
-![](https://i.imgur.com/yi24JJM.png)
+![](/static/images/yi24JJM.png)
 
 這是在官網上拿來的例子，假設我們現在要新增一位 employee：
 ```java
@@ -72,7 +72,7 @@ Employee theEmployee = session.find(Employee.class, 988);
 
 Cluster/J的增刪改的性能非常好，幾乎和 native NDB API 差不多，查詢為一般JDBC的兩倍快：
 
-![](https://i.imgur.com/nv0XTbe.png)
+![](/static/images/nv0XTbe.png)
 ### 何時使用
 由於 Cluster/J 直接訪問 Data Node 可達2億 QPS，而 Connector/J 對 SQL Node 則可到每秒250萬個 SQL 指令。因此推薦**複雜的查詢可以透過 SQL 指令查詢，而 Key-Value 的操作則以 Cluster/J 加快操作速度**。而這些都是建立在 MySQL 叢集上的，因此兩種方式都可保有高可用與擴充性。
 ## RSocket
