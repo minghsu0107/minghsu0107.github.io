@@ -1,0 +1,268 @@
+<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xml:lang=en-us lang=en-us><head><link rel=stylesheet href=https://unpkg.com/spectre.css/dist/spectre.min.css><link rel=stylesheet href=https://unpkg.com/spectre.css/dist/spectre-exp.min.css><link rel=stylesheet href=https://unpkg.com/spectre.css/dist/spectre-icons.min.css><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/styles/nnfx-dark.min.css><link rel=stylesheet href=https://pro.fontawesome.com/releases/v5.10.0/css/all.css integrity=sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p crossorigin=anonymous><link href=https://gmpg.org/xfn/11 rel=profile><meta charset=utf-8><meta name=generator content="Hugo 0.83.1"><meta name=viewport content="width=device-width,initial-scale=1"><title>[K8s] All You Need to Know to Integrate Traefik with Cloud Ingress &#183; Ming's Site</title><meta name=description content="Traefik is a powerful ingress controller with easy deployment and configuration. However, cloud providers like AWS and GCP also provide ingress implementations of their managed Kubernetes. In this post, we will take GCP as example and walk through all needed knowledge of integrating Traefik deployment with ingress provided by GKE. This way, we could enjoy the benefits of feature-rich Traefik CRD as well as convenient infrastruture provisions provided by cloud ingress."><link type=text/css rel=stylesheet href=https://minghsu0107.github.io/css/print.css media=print><link type=text/css rel=stylesheet href=https://minghsu0107.github.io/css/poole.css><link type=text/css rel=stylesheet href=https://minghsu0107.github.io/css/syntax.css><link type=text/css rel=stylesheet href=https://minghsu0107.github.io/css/hyde.css><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Abril+Fatface|PT+Sans:400,400i,700"><link rel=apple-touch-icon-precomposed sizes=144x144 href=/apple-touch-icon-144-precomposed.png><link rel="shortcut icon" href=/favicon.png></head><style>pre,code{white-space:pre;overflow-x:scroll}.hljs{display:inline-block;overflow-x:scroll;padding-right:100%;background:0 0;color:#fff;-webkit-text-size-adjust:none;min-width:2300px}</style><style>@import "https://fonts.googleapis.com/css?family=Open+Sans";body{font-family:open sans,sans-serif}.searchTerm{border-radius:5px;width:100%;border:1px solid #00b4cc;padding:8px 12px}</style><script async src="https://www.googletagmanager.com/gtag/js?id=G-96ZZVQWZLF"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date),gtag('config','G-96ZZVQWZLF')</script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/highlight.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/languages/go.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.6.0/languages/yaml.min.js></script><script>hljs.initHighlightingOnLoad()</script><body><aside class=sidebar><div class=container><div class=sidebar-about><a href=https://minghsu0107.github.io/><h1>Ming's Site</h1></a><p class=lead><a href=https://github.com/minghsu0107><i class="fab fa-github"></i></a>&nbsp;&nbsp;<a href=https://linkedin.com/in/hao-ming-hsu-178176181> <i class="fab fa-linkedin"></i></a><br><a href=/about>Hao-Ming Hsu (許浩鳴)</a><br>Learn by Doing.<br><a href=https://github.com/minghsu0107>@minghsu0107</a></p></div><nav><ul class=sidebar-nav><li><a href=/about>About</a></li><li><a href=/categories>Categories</a></li><li><a href=/tags>Tags</a></li></ul></nav><div style="margin:0 auto"><form action=https://minghsu0107.github.io/search><input placeholder=search class=searchTerm id=search-query name=s></form></div><br><p>&copy; 2021. All rights reserved.</p></div></aside><main class="content container"><div class=post><h1>[K8s] All You Need to Know to Integrate Traefik with Cloud Ingress</h1><time datetime=2021-05-22T14:57:02+0800 class=post-date>Sat, May 22, 2021 &#183; <span class=read-time>4 min read</span></time><div class=chip><a href=https://minghsu0107.github.io/tags/k8s//>K8s</a></div><div class=chip><a href=https://minghsu0107.github.io/tags/traefik//>Traefik</a></div><div class=chip><a href=https://minghsu0107.github.io/tags/ingress//>Ingress</a></div><div class=chip><a href=https://minghsu0107.github.io/tags/gcp//>GCP</a></div><div class=chip><a href=https://minghsu0107.github.io/tags/gke//>GKE</a></div><br><br><p>Traefik is a powerful ingress controller with easy deployment and configuration. However, cloud providers like AWS and GCP also provide ingress implementations of their managed Kubernetes.</p><p>In this post, we will take GCP as example and walk through all needed knowledge of integrating Traefik deployment with ingress provided by GKE. This way, we could enjoy the benefits of feature-rich Traefik CRD as well as convenient infrastruture provisions provided by cloud ingress.</p><p>All source code is available at <a href=https://github.com/minghsu0107/traefik-ingress-gke>https://github.com/minghsu0107/traefik-ingress-gke</a>.</p><h2 id=traefik-introduction>Traefik Introduction</h2><p><img src=/static/images/traefik-architecture.png alt></p><p>Traefik is an open-source Edge Router that makes publishing your services a fun and easy experience. It receives requests on behalf of your system and finds out which components are responsible for handling them. There are a lot of useful middlewares available, such as regex matching, rate limiting, authentication, and many more. The best part is that Traefik automatically discover new configurations and apply them in real time. For those who are not familiar with Traefik, reading the <a href=https://doc.traefik.io/traefik/>Traefik documentation</a> is a good start.</p><h2 id=traefik-configuration>Traefik Configuration</h2><p>In this section, we will cover common configuration of Traefik that is vendor-neutral and compatible with native Kubernetes.</p><h3 id=traefik-crd>Traefik CRD</h3><p>Traefik is natively compliant with Kubernetes using the custom resource definitions. Custom resources are extensions of the Kubernetes API, representing a customization of a particular Kubernetes installation. Custom resources help us to declare Traefik components without resorting to lots of ingress annotations.</p><p>To start with, let&rsquo;s create a namespace <code>traefik</code>:</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Namespace</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik</span>
+</code></pre></div><p>Then deploy Traefik CRDs.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apiextensions.k8s.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CustomResourceDefinition</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ingressroutes.traefik.containo.us</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>group</span>: <span style=color:#ae81ff>traefik.containo.us</span>
+  <span style=color:#f92672>names</span>:
+    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>IngressRoute</span>
+    <span style=color:#f92672>plural</span>: <span style=color:#ae81ff>ingressroutes</span>
+    <span style=color:#f92672>singular</span>: <span style=color:#ae81ff>ingressroute</span>
+  <span style=color:#f92672>scope</span>: <span style=color:#ae81ff>Namespaced</span>
+  <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1alpha1</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apiextensions.k8s.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CustomResourceDefinition</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ingressroutetcps.traefik.containo.us</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>group</span>: <span style=color:#ae81ff>traefik.containo.us</span>
+  <span style=color:#f92672>names</span>:
+    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>IngressRouteTCP</span>
+    <span style=color:#f92672>plural</span>: <span style=color:#ae81ff>ingressroutetcps</span>
+    <span style=color:#f92672>singular</span>: <span style=color:#ae81ff>ingressroutetcp</span>
+  <span style=color:#f92672>scope</span>: <span style=color:#ae81ff>Namespaced</span>
+  <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1alpha1</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apiextensions.k8s.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CustomResourceDefinition</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ingressrouteudps.traefik.containo.us</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>group</span>: <span style=color:#ae81ff>traefik.containo.us</span>
+  <span style=color:#f92672>names</span>:
+    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>IngressRouteUDP</span>
+    <span style=color:#f92672>plural</span>: <span style=color:#ae81ff>ingressrouteudps</span>
+    <span style=color:#f92672>singular</span>: <span style=color:#ae81ff>ingressrouteudp</span>
+  <span style=color:#f92672>scope</span>: <span style=color:#ae81ff>Namespaced</span>
+  <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1alpha1</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apiextensions.k8s.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CustomResourceDefinition</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>middlewares.traefik.containo.us</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>group</span>: <span style=color:#ae81ff>traefik.containo.us</span>
+  <span style=color:#f92672>names</span>:
+    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Middleware</span>
+    <span style=color:#f92672>plural</span>: <span style=color:#ae81ff>middlewares</span>
+    <span style=color:#f92672>singular</span>: <span style=color:#ae81ff>middleware</span>
+  <span style=color:#f92672>scope</span>: <span style=color:#ae81ff>Namespaced</span>
+  <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1alpha1</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apiextensions.k8s.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CustomResourceDefinition</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>tlsoptions.traefik.containo.us</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>group</span>: <span style=color:#ae81ff>traefik.containo.us</span>
+  <span style=color:#f92672>names</span>:
+    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>TLSOption</span>
+    <span style=color:#f92672>plural</span>: <span style=color:#ae81ff>tlsoptions</span>
+    <span style=color:#f92672>singular</span>: <span style=color:#ae81ff>tlsoption</span>
+  <span style=color:#f92672>scope</span>: <span style=color:#ae81ff>Namespaced</span>
+  <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1alpha1</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apiextensions.k8s.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CustomResourceDefinition</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>tlsstores.traefik.containo.us</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>group</span>: <span style=color:#ae81ff>traefik.containo.us</span>
+  <span style=color:#f92672>names</span>:
+    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>TLSStore</span>
+    <span style=color:#f92672>plural</span>: <span style=color:#ae81ff>tlsstores</span>
+    <span style=color:#f92672>singular</span>: <span style=color:#ae81ff>tlsstore</span>
+  <span style=color:#f92672>scope</span>: <span style=color:#ae81ff>Namespaced</span>
+  <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1alpha1</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apiextensions.k8s.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CustomResourceDefinition</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefikservices.traefik.containo.us</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>group</span>: <span style=color:#ae81ff>traefik.containo.us</span>
+  <span style=color:#f92672>names</span>:
+    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>TraefikService</span>
+    <span style=color:#f92672>plural</span>: <span style=color:#ae81ff>traefikservices</span>
+    <span style=color:#f92672>singular</span>: <span style=color:#ae81ff>traefikservice</span>
+  <span style=color:#f92672>scope</span>: <span style=color:#ae81ff>Namespaced</span>
+  <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1alpha1</span>
+</code></pre></div><p>Next, create a service account <code>traefik-ingress-controller</code> and bind a cluster role to it so that Traefik could use the service account to access custom resources.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik-ingress-controller</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>traefik</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik-ingress-controller</span>
+<span style=color:#f92672>rules</span>:
+- <span style=color:#f92672>apiGroups</span>:
+  - <span style=color:#e6db74>&#34;&#34;</span>
+  <span style=color:#f92672>resources</span>:
+  - <span style=color:#ae81ff>services</span>
+  - <span style=color:#ae81ff>endpoints</span>
+  - <span style=color:#ae81ff>secrets</span>
+  <span style=color:#f92672>verbs</span>:
+  - <span style=color:#ae81ff>get</span>
+  - <span style=color:#ae81ff>list</span>
+  - <span style=color:#ae81ff>watch</span>
+- <span style=color:#f92672>apiGroups</span>:
+  - <span style=color:#ae81ff>extensions</span>
+  - <span style=color:#ae81ff>networking.k8s.io</span>
+  <span style=color:#f92672>resources</span>:
+  - <span style=color:#ae81ff>ingresses</span>
+  - <span style=color:#ae81ff>ingressclasses</span>
+  <span style=color:#f92672>verbs</span>:
+  - <span style=color:#ae81ff>get</span>
+  - <span style=color:#ae81ff>list</span>
+  - <span style=color:#ae81ff>watch</span>
+- <span style=color:#f92672>apiGroups</span>:
+  - <span style=color:#ae81ff>extensions</span>
+  <span style=color:#f92672>resources</span>:
+  - <span style=color:#ae81ff>ingresses/status</span>
+  <span style=color:#f92672>verbs</span>:
+  - <span style=color:#ae81ff>update</span>
+- <span style=color:#f92672>apiGroups</span>:
+  - <span style=color:#ae81ff>traefik.containo.us</span>
+  <span style=color:#f92672>resources</span>:
+  - <span style=color:#ae81ff>middlewares</span>
+  - <span style=color:#ae81ff>ingressroutes</span>
+  - <span style=color:#ae81ff>traefikservices</span>
+  - <span style=color:#ae81ff>ingressroutetcps</span>
+  - <span style=color:#ae81ff>ingressrouteudps</span>
+  - <span style=color:#ae81ff>tlsoptions</span>
+  - <span style=color:#ae81ff>tlsstores</span>
+  <span style=color:#f92672>verbs</span>:
+  - <span style=color:#ae81ff>get</span>
+  - <span style=color:#ae81ff>list</span>
+  - <span style=color:#ae81ff>watch</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRoleBinding</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik-ingress-controller</span>
+<span style=color:#f92672>roleRef</span>:
+  <span style=color:#f92672>apiGroup</span>: <span style=color:#ae81ff>rbac.authorization.k8s.io</span>
+  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterRole</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik-ingress-controller</span>
+<span style=color:#f92672>subjects</span>:
+- <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ServiceAccount</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik-ingress-controller</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>traefik</span>
+</code></pre></div><p>Next, deploy Traefik itself using Kubernetes <code>Deployment</code> type.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>apps/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Deployment</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>prometheus.io/port</span>: <span style=color:#ae81ff>http-metrics</span>
+    <span style=color:#f92672>prometheus.io/scrape</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>traefik</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>traefik</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>replicas</span>: <span style=color:#ae81ff>1</span>
+  <span style=color:#f92672>selector</span>:
+    <span style=color:#f92672>matchLabels</span>:
+      <span style=color:#f92672>app</span>: <span style=color:#ae81ff>traefik</span>
+  <span style=color:#f92672>template</span>:
+    <span style=color:#f92672>metadata</span>:
+      <span style=color:#f92672>labels</span>:
+        <span style=color:#f92672>app</span>: <span style=color:#ae81ff>traefik</span>
+    <span style=color:#f92672>spec</span>:
+      <span style=color:#f92672>serviceAccountName</span>: <span style=color:#ae81ff>traefik-ingress-controller</span>
+      <span style=color:#f92672>containers</span>:
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik</span>
+        <span style=color:#f92672>ports</span>:
+        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>80</span>
+          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>web</span>
+        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>8080</span>
+          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>admin</span>
+        - <span style=color:#f92672>containerPort</span>: <span style=color:#ae81ff>8082</span>
+          <span style=color:#f92672>name</span>: <span style=color:#ae81ff>http-metrics</span>
+        <span style=color:#f92672>args</span>:
+        - --<span style=color:#ae81ff>log.level=INFO</span>
+        - --<span style=color:#ae81ff>api</span>
+        - --<span style=color:#ae81ff>api.dashboard</span>
+        - --<span style=color:#ae81ff>api.insecure</span>
+        - --<span style=color:#ae81ff>entrypoints.web.address=:80</span>
+        - --<span style=color:#ae81ff>providers.kubernetescrd</span>
+        - --<span style=color:#ae81ff>metrics.prometheus.entryPoint=metrics</span>
+        - --<span style=color:#ae81ff>entryPoints.metrics.address=:8082</span>
+        - --<span style=color:#ae81ff>accesslog=true</span>
+        - --<span style=color:#ae81ff>ping</span>
+        - --<span style=color:#ae81ff>ping.entryPoint=web</span>
+        <span style=color:#f92672>image</span>: <span style=color:#ae81ff>traefik:v2.3</span>
+        <span style=color:#f92672>readinessProbe</span>:
+          <span style=color:#f92672>httpGet</span>:
+            <span style=color:#f92672>path</span>: <span style=color:#ae81ff>/ping</span>
+            <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+</code></pre></div><p>We deploy Traefik in <code>traefik</code> namespace and expose prometheus endpoint at <code>0.0.0.0:8082/metrics</code>. We also enable readiness probe on <code>0.0.0.0/ping</code>. This is neccessary because GKE inteprets readiness probe as service health check parameter.</p><p>Finally, deploy a <code>NodePort</code> service to expose Traefik deployment.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Service</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>prometheus.io/port</span>: <span style=color:#e6db74>&#34;8082&#34;</span>
+    <span style=color:#f92672>prometheus.io/scrape</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>traefik</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>traefik</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>NodePort</span>
+  <span style=color:#f92672>ports</span>:
+  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>web</span>
+    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>80</span>
+    <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>TCP</span>
+    <span style=color:#f92672>targetPort</span>: <span style=color:#ae81ff>80</span>
+  - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>http-metrics</span>
+    <span style=color:#f92672>port</span>: <span style=color:#ae81ff>8082</span>
+    <span style=color:#f92672>protocol</span>: <span style=color:#ae81ff>TCP</span>
+    <span style=color:#f92672>targetPort</span>: <span style=color:#ae81ff>8082</span>
+  <span style=color:#f92672>selector</span>:
+    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>traefik</span>
+</code></pre></div><h2 id=deploy-to-google-kubernetes-engine-gke>Deploy to Google Kubernetes Engine (GKE)</h2><p>Instead of directly enabling external load balancer on Traefik service, we handle external traffic by GKE ingress and proxy it to internal Traefik router by HTTP. This way, we could benefit from L7 load balancer features, such as managed certificates and HTTPS redirection, of our ingress instance without modifying any Traefik configuration. The routing now would be like <code>Ingress</code> -> <code>Traefik</code> -> <code>App</code>.</p><p><strong>Note that your GKE cluster needs to be running at least a recent version 1.17-gke for this to work.</strong></p><p>First, create a static reserved ip address going by the name of <code>traefik-ip</code>.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>gcloud compute addresses create traefik-ip --global
+</code></pre></div><p>Then, deploy an ingress annotated with managed certificate and HTTPS redirection.</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.gke.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ManagedCertificate</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik-cert</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>domains</span>:
+  - <span style=color:#ae81ff>mydomain.com</span>
+  - <span style=color:#ae81ff>api.mydomain.com</span>
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.gke.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>FrontendConfig</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>traefik-frontend-cfg</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>traefik</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>redirectToHttps</span>:
+    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>true</span>
+    <span style=color:#f92672>responseCodeName</span>: <span style=color:#ae81ff>PERMANENT_REDIRECT</span>
+---
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Ingress</span>
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>networking.k8s.io/v1beta1</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>myingress</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>traefik</span>
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>kubernetes.io/ingress.global-static-ip-name</span>: <span style=color:#e6db74>&#34;traefik-ip&#34;</span>
+    <span style=color:#f92672>networking.gke.io/v1beta1.FrontendConfig</span>: <span style=color:#e6db74>&#34;traefik-frontend-cfg&#34;</span>
+    <span style=color:#f92672>networking.gke.io/managed-certificates</span>: <span style=color:#e6db74>&#34;traefik-cert&#34;</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>backend</span>:
+    <span style=color:#f92672>serviceName</span>: <span style=color:#ae81ff>traefik</span>
+    <span style=color:#f92672>servicePort</span>: <span style=color:#ae81ff>80</span>
+</code></pre></div><p>Above configuration creates a managed certficate on domains <code>mydomain.com</code> and <code>api.mydomain.com</code>. Google Cloud provisions managed certificates valid for 90 days. About one month before expiry, the process to renew your certificate automatically begins. Our ingress instance will use this certificate to handle HTTPS requests. Also, we have set up automatic HTTPS redirection using native GKE resource <code>FrontendConfig</code>.</p><h2 id=conclusion>Conclusion</h2><p>In this post, we have covered details on deploying Traefik to GKE while having it integrated with GKE-native ingress. Such combination helps us decouple Traefik components from cloud ingress features like certificate management and HTTPS redirection, increasing the overall maintainability.</p></div><h2>Read More</h2><ul><li><a href=https://minghsu0107.github.io/posts/k8s-ha/>[K8s] Learn Kubernetes HA Architecture with Hands-On Example</a></li><li><a href=https://minghsu0107.github.io/posts/droneci-argocd/>[K8s] 使用 DroneCI 與 ArgoCD 實現 K8s 自動整合部署</a></li></ul><h2>Comments</h2><script src=https://utteranc.es/client.js repo=minghsu0107/blog issue-term=pathname theme=github-light crossorigin=anonymous async></script></main></body></html>
