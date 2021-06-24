@@ -46,7 +46,7 @@ $relevantArticles | append $article }}
 {{ end }}
 
 {{ if $recommendedArticles }}
-<h2>Recommended Articles</h2>
+<h2>Read More</h2>
 {{end}}
 <ul>
   {{ range (shuffle (first 5 $recommendedArticles)) }}
