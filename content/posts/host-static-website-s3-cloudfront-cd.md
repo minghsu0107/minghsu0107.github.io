@@ -15,7 +15,7 @@ description: |-
 
 We will build a continuous delivery pipeline that deploys a React application to Amazon S3 and syncs it with Amazon CloudFront, a content delivery network (CDN) managed by AWS.
 
-All source code is available at https://github.com/minghsu0107/sync-react-s3-cloudfront.
+All source codes are available at https://github.com/minghsu0107/sync-react-s3-cloudfront.
 <!--more-->
 ## Why
 It is quite convenient to configure a S3 bucket for static website hosting. However, we can only access it via HTTP protocol. A great way to host our contents is to place it to Amazon CloudFront. This way, not only can we benefit from HTTPS protection but also the out-of-the-box caching mechanism CloudFront provides for us.

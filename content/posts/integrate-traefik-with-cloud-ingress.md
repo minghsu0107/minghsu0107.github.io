@@ -18,7 +18,7 @@ Traefik is a powerful ingress controller with easy deployment and configuration.
 
 In this post, we will take GCP as example and walk through all needed knowledge of integrating Traefik deployment with ingress provided by GKE. This way, we could enjoy the benefits of feature-rich Traefik CRD as well as convenient infrastruture provisions provided by cloud ingress.
 
-All source code is available at https://github.com/minghsu0107/traefik-ingress-gke.
+All source codes are available at https://github.com/minghsu0107/traefik-ingress-gke.
 <!--more-->
 ## Traefik Introduction
 ![](/static/images/traefik-architecture.png)
