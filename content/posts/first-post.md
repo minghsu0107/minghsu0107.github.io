@@ -92,22 +92,22 @@ jobs:
           hugo-version: '0.83.1'
 
       - name: Build
-        run: hugo --minify
+        run: hugo --minify  # Package the blog into ./public/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          publish_dir: ./public # Copy contents in ./public/ to branch gh-pages
           cname: minghsu.io
 ```
-接著新增一個新的分支 `gh-pages`，Github Actions 之後會將部落格打包並部署這個分支：
+接著新增一個新的分支 `gh-pages`，Github Actions 會將部落格打包並部署到這個分支：
 ```bash
 git checkout -b gh-pages
 git push origin gh-pages
 ```
-把 code 推到 Github 上之後，Github Actions 會開始部署部落格。不過這次的部署會失敗，因為我們還沒設定 Github Pages 的 branch。因此接著我們要到 `Settings -> Pages` 將 Github Pages 的分支設定為 `gh-pages`。現在 Github Pages 會重新開始部署，成功之後瀏覽 `https://minghsu.io` 就能看到部落格！
+把 code 推到 Github 上之後，Github Actions 會開始部署部落格。不過這次的部署會失敗，因為我們還沒設定 Github Pages 的 branch。因此接著我們要到 `Settings -> Pages` 將 Github Pages 的分支設定為 `gh-pages` 並設定 project folder 為 root。現在 Github Pages 會重新開始部署，成功之後瀏覽 `https://minghsu.io` 就能看到部落格！
 ## Reference
 - https://themes.gohugo.io/hyde/
 - https://gohugo.io/templates/lookup-order/
