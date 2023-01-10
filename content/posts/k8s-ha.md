@@ -40,10 +40,13 @@ To sum up, we have the following architecture:
 3. HAProxy load-balances traffic to three K8s API servers.
 
 The following section is hands-on tutorial that implements the above architecture.
+
 ## Settings
+
 - Three controller plane nodes in private network: `172.16.0.0/16`
 - Node private IPs: `172.16.217.171`, `172.16.217.172`, `172.16.217.173`
 - Virtual IP: `172.16.100.100`, `172.16.100.101`
+
 ## Usage
 You can find full source code on [my Github](https://github.com/minghsu0107/k8s-ha).
 
