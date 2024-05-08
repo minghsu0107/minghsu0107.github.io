@@ -1,7 +1,6 @@
 baseURL: https://minghsu0107.github.io/
 languageCode: en-us
 title: Ming's Site
-
 theme : 'hyde'
 
 Menus:
@@ -12,7 +11,6 @@ Menus:
       URL: "/tags"
     - Name: "Categories"
       URL: "/categories"
-
 #disqusShortname : minghsu0107
 
 outputs:
